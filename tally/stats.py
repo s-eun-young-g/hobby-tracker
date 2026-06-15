@@ -10,13 +10,20 @@ from datetime import date, timedelta
 from typing import Optional
 
 
-def _to_date(s: str) -> date:
-    return date.fromisoformat(s)
+def _parse_dates(dates: list[str]) -> list[date]:
+    """Parse ISO date strings, skipping anything unparseable (never raises)."""
+    out = []
+    for s in dates:
+        try:
+            out.append(date.fromisoformat(s))
+        except (ValueError, TypeError):
+            continue
+    return out
 
 
 def current_streak(dates: list[str], today: date) -> int:
     """Consecutive days up to today (or yesterday) that have at least one entry."""
-    days = {_to_date(d) for d in dates}
+    days = set(_parse_dates(dates))
     if not days:
         return 0
     cursor = today
@@ -32,7 +39,7 @@ def current_streak(dates: list[str], today: date) -> int:
 
 
 def longest_streak(dates: list[str]) -> int:
-    days = sorted({_to_date(d) for d in dates})
+    days = sorted(set(_parse_dates(dates)))
     if not days:
         return 0
     best = run = 1
@@ -52,8 +59,7 @@ def best_score(scores: list[float], better: Optional[str]) -> Optional[float]:
 def heatmap(dates: list[str], today: date, days: int = 84) -> list[tuple[str, int]]:
     """Counts per day for the last ``days`` days, oldest first."""
     counts: dict[date, int] = {}
-    for d in dates:
-        dt = _to_date(d)
+    for dt in _parse_dates(dates):
         counts[dt] = counts.get(dt, 0) + 1
     start = today - timedelta(days=days - 1)
     out = []
