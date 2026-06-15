@@ -17,26 +17,34 @@
     {% for e in entries %}
     {% set h = get(e.hobby) %}
     <figure class="g-card">
-      {% if e.image_url %}
+      {% if e.image_path %}
+        <img src="/uploads/{{ e.image_path }}" alt="{{ e.title }}">
+      {% elif e.image_url %}
         <img src="{{ e.image_url }}" alt="{{ e.title }}">
       {% else %}
         <div class="g-tile" style="background:{{ h.color if h else '#444' }}">
           <span class="g-kind">{{ h.label if h else e.hobby }}</span>
-          {% if e.score is not none %}<span class="g-score">{{ e.score | int }}</span>{% endif %}
+          {% if e.score is not none %}
+          <span class="g-score">{{ minsec(e.score) if h and h.score_is_time else e.score|int }}</span>
+          {% endif %}
         </div>
       {% endif %}
       <figcaption>
         <b>{{ e.title or (h.label if h else e.hobby) }}</b>
         <span class="g-meta">
           {{ e.date }}
-          {% if e.rating %} {{ e.rating }}/5{% endif %}
-          {% if e.result %} {{ e.result }}{% endif %}
+          {% if e.rating %}, {{ e.rating }}/5{% endif %}
+          {% for k, v in (e.data or {}).items() %}{% if v %}, {{ v }}{% endif %}{% endfor %}
+          {% if e.score is not none and h and h.score_label %}
+           , {{ (minsec(e.score) if h.score_is_time else e.score|int) }}{{ '' if h.score_is_time else ' ' ~ h.score_label }}
+          {% endif %}
         </span>
-        {% if e.link %}<a class="g-link" href="{{ e.link }}" target="_blank">link</a>{% endif %}
-        <form method="post" action="/entry/{{ e.id }}/delete" class="g-del"
-              onsubmit="return confirm('Delete this entry?')">
-          <button>delete</button>
-        </form>
+        <span class="g-actions">
+          <a href="/edit/{{ e.id }}">edit</a>
+          {% if e.link %}<a href="{{ e.link }}" target="_blank">link</a>{% endif %}
+          <form method="post" action="/entry/{{ e.id }}/delete"
+                onsubmit="return confirm('Delete this entry?')"><button>delete</button></form>
+        </span>
       </figcaption>
     </figure>
     {% endfor %}

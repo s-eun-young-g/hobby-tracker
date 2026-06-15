@@ -80,9 +80,37 @@ button.primary { background:var(--pink); }
   background:var(--pink-soft); border:2px solid var(--ink); border-radius:999px;
   padding:.1rem .6rem; display:inline-block; max-width:max-content;
 }
-.d-ok { color:var(--pink); font-weight:700; text-transform:uppercase; font-size:.8rem; }
-.d-form { display:flex; gap:.5rem; align-items:center; margin:0; }
-.d-form input { width:6.5rem; margin:0; }
+.d-name + .d-streak { }
+.daily .btn { margin-left:auto; }
+
+/* add-anything buttons */
+.add-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:.7rem; }
+.add-btn {
+  display:flex; align-items:center; gap:.5rem; text-decoration:none; color:var(--ink);
+  background:var(--paper); border:2.5px solid var(--ink); border-radius:11px;
+  padding:.7rem .8rem; font-weight:700; text-transform:uppercase; letter-spacing:-.01em;
+  box-shadow:var(--shadow-sm); transition:transform .06s, box-shadow .06s;
+}
+.add-btn:hover { transform:translate(-2px,-2px); box-shadow:var(--shadow); }
+.ab-dot { width:.9rem; height:.9rem; border-radius:50%; border:1.5px solid var(--ink); }
+
+/* form extras */
+.time-in { display:flex; align-items:center; gap:.4rem; }
+.time-in input { width:5rem; }
+.cur-img { display:block; max-width:140px; border:2px solid var(--ink); border-radius:8px; margin:.3rem 0; }
+.form-actions { display:flex; gap:.7rem; align-items:center; }
+.btn {
+  text-decoration:none; color:var(--ink); background:#fff; border:2px solid var(--ink);
+  padding:.5rem .9rem; border-radius:9px; font-weight:700; text-transform:uppercase;
+  font-size:.85rem; box-shadow:var(--shadow-sm);
+}
+.btn:hover { transform:translate(-1px,-1px); }
+.g-actions { display:flex; gap:.6rem; align-items:center; margin-top:.4rem; font-size:.76rem; }
+.g-actions a { color:var(--pink); font-weight:700; text-transform:uppercase; text-decoration:none; }
+.g-actions form { display:inline; margin:0; }
+.g-actions button { padding:.1rem .45rem; font-size:.7rem; box-shadow:none; border-width:1.5px;
+                    color:var(--muted); background:none; }
+.g-actions button:hover { transform:none; color:var(--pink); }
 
 /* tracker */
 table.grid { width:100%; border-collapse:collapse; }

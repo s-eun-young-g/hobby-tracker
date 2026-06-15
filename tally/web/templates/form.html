@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ "Edit" if editing else "Add" }} {{ hobby.label }} - tally{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>{{ "Edit" if editing else "Add" }} {{ hobby.label }}</h1>
+  <form method="post" action="{{ action }}" enctype="multipart/form-data" class="stack">
+    {% for f in hobby.fields %}
+      {% set val = values.get(f.key) %}
+      <label>{{ f.label }}{% if f.required %} *{% endif %}
+
+        {% if f.type in ("text", "url", "number") %}
+          <input type="{{ 'url' if f.type=='url' else ('number' if f.type=='number' else 'text') }}"
+                 name="{{ f.key }}" value="{{ val if val is not none else '' }}"
+                 placeholder="{{ f.placeholder }}" {{ 'required' if f.required }}
+                 {{ 'step=any' if f.type=='number' }}>
+
+        {% elif f.type == "date" %}
+          <input type="date" name="{{ f.key }}" value="{{ val or '' }}">
+
+        {% elif f.type == "rating" %}
+          <select name="{{ f.key }}">
+            <option value="">unrated</option>
+            {% for n in [1,2,3,4,5] %}
+            <option value="{{ n }}" {{ 'selected' if val and (val|int)==n }}>{{ n }}/5</option>
+            {% endfor %}
+          </select>
+
+        {% elif f.type == "select" %}
+          <select name="{{ f.key }}">
+            <option value="">--</option>
+            {% for o in f.options %}
+            <option value="{{ o }}" {{ 'selected' if val==o }}>{{ o }}</option>
+            {% endfor %}
+          </select>
+
+        {% elif f.type == "category" %}
+          <input name="{{ f.key }}" list="cats" value="{{ val or '' }}"
+                 placeholder="pick or type a new one">
+          <datalist id="cats">
+            {% for c in categories %}<option value="{{ c }}">{% endfor %}
+          </datalist>
+
+        {% elif f.type == "time" %}
+          {% set secs = (val or 0)|int %}
+          <span class="time-in">
+            <input type="number" name="{{ f.key }}_min" min="0" value="{{ secs // 60 }}"> min
+            <input type="number" name="{{ f.key }}_sec" min="0" max="59" value="{{ secs % 60 }}"> sec
+          </span>
+
+        {% elif f.type == "image" %}
+          {% if val %}<img class="cur-img" src="{{ ('/uploads/' ~ val) if not val.startswith('http') else val }}" alt="">{% endif %}
+          <input type="file" name="{{ f.key }}" accept="image/*">
+          <input name="{{ f.key }}_url" placeholder="or paste an image URL">
+        {% endif %}
+      </label>
+    {% endfor %}
+
+    <div class="form-actions">
+      <button class="primary" type="submit">{{ "Save changes" if editing else "Add to log" }}</button>
+      <a class="btn" href="/gallery">Cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

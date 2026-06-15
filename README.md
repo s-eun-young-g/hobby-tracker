@@ -15,6 +15,11 @@ later.
 
 ## Run it
 
+Easiest: double-click `run.command` in Finder. It sets things up on first run, starts
+the app, and opens it in your browser. Close the window to stop.
+
+From a terminal:
+
 ```bash
 git clone https://github.com/s-eun-young-g/hobby-tracker
 cd hobby-tracker
@@ -24,6 +29,10 @@ tally            # serves on http://0.0.0.0:8000
 
 Open http://localhost:8000 on your laptop. To log from your phone, share your LAN
 address (for example http://192.168.1.42:8000) while on the same wifi.
+
+Your entries are saved on your machine in a small database at
+`~/.local/share/tally/tally.db`, with uploaded images alongside it. Nothing leaves
+your laptop, and the data persists across restarts and updates.
 
 ## What it does
 
