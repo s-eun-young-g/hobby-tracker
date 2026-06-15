@@ -33,6 +33,17 @@ templates.env.globals["minsec"] = lambda s: (
     f"{int(s) // 60}:{int(s) % 60:02d}" if s not in (None, "") else "")
 
 
+def _scorefmt(v) -> str:
+    """Whole numbers without decimals, fractional scores to two places (e.g. 7.42)."""
+    if v in (None, ""):
+        return ""
+    f = float(v)
+    return str(int(f)) if f == int(f) else f"{f:.2f}"
+
+
+templates.env.globals["scorefmt"] = _scorefmt
+
+
 # -- parsing helpers ---------------------------------------------------------
 def _num(value) -> Optional[float]:
     value = (str(value) if value is not None else "").strip()

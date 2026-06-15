@@ -25,7 +25,7 @@
         <div class="g-tile" style="background:{{ h.color if h else '#444' }}">
           <span class="g-kind">{{ h.label if h else e.hobby }}</span>
           {% if e.score is not none %}
-          <span class="g-score">{{ minsec(e.score) if h and h.score_is_time else e.score|int }}</span>
+          <span class="g-score">{{ minsec(e.score) if h and h.score_is_time else scorefmt(e.score) }}</span>
           {% endif %}
         </div>
       {% endif %}
@@ -36,7 +36,7 @@
           {% if e.rating %}, {{ e.rating }}/5{% endif %}
           {% for k, v in (e.data or {}).items() %}{% if v %}, {{ v }}{% endif %}{% endfor %}
           {% if e.score is not none and h and h.score_label %}
-           , {{ (minsec(e.score) if h.score_is_time else e.score|int) }}{{ '' if h.score_is_time else ' ' ~ h.score_label }}
+           , {{ (minsec(e.score) if h.score_is_time else scorefmt(e.score)) }}{{ '' if h.score_is_time else ' ' ~ h.score_label }}
           {% endif %}
         </span>
         <span class="g-actions">
