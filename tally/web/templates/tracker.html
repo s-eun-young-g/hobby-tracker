@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Tracker - tally{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Tracker</h1>
+  <div class="heatmap">
+    {% for day, count in heatmap %}
+    <span class="cell lvl-{{ 3 if count >= 3 else count }}" title="{{ day }}: {{ count }}"></span>
+    {% endfor %}
+  </div>
+  <p class="muted small">Last 84 days, all hobbies. Darker means more entries that day.</p>
+</section>
+
+<section class="card">
+  <h2>By hobby</h2>
+  <table class="grid">
+    <thead><tr><th>Hobby</th><th>Entries</th><th>Streak</th><th>Longest</th><th>Best</th><th>Last</th></tr></thead>
+    <tbody>
+      {% for c in cards %}
+      <tr>
+        <td><span class="dot" style="background:{{ c.hobby.color }}"></span>{{ c.hobby.label }}</td>
+        <td>{{ c.total }}</td>
+        <td>{{ (c.streak ~ ' d') if c.streak is not none else '-' }}</td>
+        <td>{{ (c.longest ~ ' d') if c.longest is not none else '-' }}</td>
+        <td>{{ (c.best | round(0, 'common') | int ~ ' ' ~ (c.hobby.score_label or '')) if c.best is not none else '-' }}</td>
+        <td>{{ c.last or '-' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

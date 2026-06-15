@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Gallery - tally{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Gallery</h1>
+  <div class="chips">
+    <a class="chip {{ 'on' if not active }}" href="/gallery">All</a>
+    {% for h in hobbies %}
+    <a class="chip {{ 'on' if active == h.key }}" href="/gallery?hobby={{ h.key }}">{{ h.label }}</a>
+    {% endfor %}
+  </div>
+
+  {% if not entries %}
+  <p class="muted">Nothing logged yet. Add something from the Today page.</p>
+  {% else %}
+  <div class="cards">
+    {% for e in entries %}
+    {% set h = get(e.hobby) %}
+    <figure class="g-card">
+      {% if e.image_url %}
+        <img src="{{ e.image_url }}" alt="{{ e.title }}">
+      {% else %}
+        <div class="g-tile" style="background:{{ h.color if h else '#444' }}">
+          <span class="g-kind">{{ h.label if h else e.hobby }}</span>
+          {% if e.score is not none %}<span class="g-score">{{ e.score | int }}</span>{% endif %}
+        </div>
+      {% endif %}
+      <figcaption>
+        <b>{{ e.title or (h.label if h else e.hobby) }}</b>
+        <span class="g-meta">
+          {{ e.date }}
+          {% if e.rating %} {{ e.rating }}/5{% endif %}
+          {% if e.result %} {{ e.result }}{% endif %}
+        </span>
+        {% if e.link %}<a class="g-link" href="{{ e.link }}" target="_blank">link</a>{% endif %}
+        <form method="post" action="/entry/{{ e.id }}/delete" class="g-del"
+              onsubmit="return confirm('Delete this entry?')">
+          <button>delete</button>
+        </form>
+      </figcaption>
+    </figure>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

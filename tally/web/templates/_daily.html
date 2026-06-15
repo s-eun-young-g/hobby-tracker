@@ -1,0 +1,21 @@
+<div id="daily">
+  <ul class="daily">
+    {% for row in daily %}
+    <li class="{{ 'done' if row.logged }}">
+      <span class="d-name">{{ row.hobby.label }}</span>
+      <span class="d-streak">{{ row.streak }} day streak</span>
+      {% if row.logged %}
+        <span class="d-ok">logged today</span>
+      {% else %}
+        <form hx-post="/log" hx-target="#daily" hx-swap="outerHTML" class="d-form">
+          <input type="hidden" name="hobby" value="{{ row.hobby.key }}">
+          {% if row.hobby.score_label %}
+          <input type="number" step="any" name="score" placeholder="{{ row.hobby.score_label }}">
+          {% endif %}
+          <button>Log today</button>
+        </form>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</div>

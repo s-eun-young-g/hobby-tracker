@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h1>Today</h1>
+  <p class="muted">Tap to log a daily game. Streaks count consecutive days.</p>
+  {% include "_daily.html" %}
+</section>
+
+<section class="card">
+  <h2>Add an entry</h2>
+  <form method="post" action="/entry" class="stack">
+    <label>Hobby
+      <select name="hobby" id="hobby">
+        {% for h in hobbies %}<option value="{{ h.key }}">{{ h.label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Title <input name="title" placeholder="book / movie / paper title, or game"></label>
+    <div class="row">
+      <label>Date <input type="date" name="date_str" value="{{ today }}"></label>
+      <label>Score <input type="number" step="any" name="score" placeholder="optional"></label>
+      <label>Rating (1-5) <input type="number" min="1" max="5" name="rating" placeholder="optional"></label>
+    </div>
+    <div class="row">
+      <label>Result <input name="result" placeholder="win / loss (games)"></label>
+      <label>Image URL <input name="image_url" placeholder="cover / poster (optional)"></label>
+      <label>Link <input name="link" placeholder="paper / source URL (optional)"></label>
+    </div>
+    <label>Notes <input name="notes" placeholder="optional"></label>
+    <button class="primary" type="submit">Add to log</button>
+  </form>
+</section>
+{% endblock %}

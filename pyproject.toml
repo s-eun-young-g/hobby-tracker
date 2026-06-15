@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tally"
+version = "0.1.0"
+description = "A local hobby tracker and gallery: one log for books, movies, games, and papers"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Sofia Guerra" }]
+keywords = ["habit-tracker", "hobbies", "gallery", "fastapi", "self-hosted"]
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "jinja2>=3.1",
+    "python-multipart>=0.0.9",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "httpx>=0.27"]
+
+[project.scripts]
+tally = "tally.web.app:main"
+
+[project.urls]
+Homepage = "https://github.com/s-eun-young-g/hobby-tracker"
+
+[tool.hatch.build.targets.wheel]
+packages = ["tally"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
