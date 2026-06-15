@@ -6,6 +6,8 @@ online Set, and papers you read for fun. It gives you two views over the same lo
 habit tracker (streaks, a calendar heatmap, personal bests) and a gallery (a visual
 grid of covers, posters, and score cards).
 
+![tally gallery view](docs/gallery.png)
+
 Most of these hobbies are closed apps with no API or export, so v1 is manual: a fast
 one-tap log for daily games and a short form for everything else. The logging is the
 habit. Auto-import for the few open sources (Letterboxd, Goodreads, papers) can come
