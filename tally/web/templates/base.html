@@ -4,12 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}tally{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 </head>
 <body>
   <header class="topbar">
-    <a href="/" class="brand">tally</a>
+    <a href="/" class="brand"><span class="burst" aria-hidden="true"></span>tally</a>
     <nav>
       <a href="/">Today</a>
       <a href="/tracker">Tracker</a>
