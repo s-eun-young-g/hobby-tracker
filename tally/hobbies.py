@@ -23,6 +23,10 @@ MOVIE_GENRES = ("Action", "Adventure", "Animation", "Comedy", "Crime", "Document
                 "Sci-Fi", "Thriller", "Western")
 DIFFICULTY = ("Easy", "Moderate", "Hard", "Challenging")
 SEED_PAPER_CATEGORIES = ("animals", "history", "for the lols")
+SET_MODES = ("UltraSet (single player)", "UltraSet (multiplayer)",
+             "Set (single player)", "Set (multiplayer)")
+SET_SINGLE = (SET_MODES[0], SET_MODES[2])
+SET_MULTI = (SET_MODES[1], SET_MODES[3])
 
 
 @dataclass(frozen=True)
@@ -34,6 +38,10 @@ class Field:
     options: tuple = ()
     required: bool = False
     placeholder: str = ""
+    # show this field only when another field's value is one of the listed values.
+    # tuple of (other_field_key, (allowed values, ...)); a field with multiple
+    # conditions shows only when all are satisfied (and their controllers are shown).
+    show_when: tuple = ()
 
 
 @dataclass(frozen=True)
@@ -71,18 +79,32 @@ HOBBIES: dict[str, Hobby] = {
     "set": Hobby(
         "set", "Set", "game", False, "#9b59b6",
         score_better="low", score_label="time", score_is_time=True,
-        fields=(Field("time", "Time", "time", "score"), _date())),
+        fields=(Field("mode", "Mode", "select", "data", options=SET_MODES),
+                Field("time", "Time", "time", "score", show_when=(("mode", SET_SINGLE),)),
+                Field("num_sets", "Number of sets", "number", "data",
+                      show_when=(("mode", SET_MULTI),)),
+                Field("opponents", "Opponents", "text", "data",
+                      placeholder="who you played", show_when=(("mode", SET_MULTI),)),
+                Field("result", "Result", "select", "data", options=("Win", "Loss"),
+                      show_when=(("mode", SET_MULTI),)),
+                Field("winner", "Winner", "text", "data",
+                      placeholder="who won", show_when=(("result", ("Loss",)),)),
+                Field("winner_sets", "Winner's sets", "number", "data",
+                      show_when=(("result", ("Loss",)),)),
+                _date())),
     "anagrams": Hobby(
         "anagrams", "Anagrams", "game", False, "#e0883b",
         score_better="high", score_label="points",
         fields=(Field("score", "Score", "number", "score"),
                 Field("opponents", "Opponents", "text", "data", placeholder="who you played"),
+                Field("result", "Result", "select", "data", options=("Win", "Loss")),
                 _date())),
     "word_hunt": Hobby(
         "word_hunt", "Word Hunt", "game", False, "#d6553b",
         score_better="high", score_label="points",
         fields=(Field("score", "Score", "number", "score"),
                 Field("opponents", "Opponents", "text", "data", placeholder="who you played"),
+                Field("result", "Result", "select", "data", options=("Win", "Loss")),
                 _date())),
     "dialed_sound": Hobby(
         "dialed_sound", "Dialed", "game", True, "#0aa1dc",

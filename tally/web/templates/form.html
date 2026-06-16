@@ -6,7 +6,8 @@
   <form method="post" action="{{ action }}" enctype="multipart/form-data" class="stack">
     {% for f in hobby.fields %}
       {% set val = values.get(f.key) %}
-      <label>{{ f.label }}{% if f.required %} *{% endif %}
+      <label class="ff" data-key="{{ f.key }}"
+             {% if f.show_when %}data-showwhen='{{ f.show_when | tojson }}'{% endif %}>{{ f.label }}{% if f.required %} *{% endif %}
 
         {% if f.type in ("text", "url", "number") %}
           <input type="{{ 'url' if f.type=='url' else ('number' if f.type=='number' else 'text') }}"
@@ -61,4 +62,36 @@
     </div>
   </form>
 </section>
+
+<script>
+  // Show or hide fields based on other fields' values (e.g. Set's mode and result).
+  (function () {
+    const form = document.querySelector("form");
+    if (!form) return;
+    const fields = Array.from(form.querySelectorAll(".ff"));
+    function valueOf(key) {
+      const el = form.querySelector('[name="' + key + '"]');
+      return el ? el.value : "";
+    }
+    function recompute() {
+      for (let pass = 0; pass < 6; pass++) {
+        let changed = false;
+        for (const el of fields) {
+          if (!el.dataset.showwhen) continue;
+          let visible = true;
+          for (const [k, vals] of JSON.parse(el.dataset.showwhen)) {
+            const ctrl = form.querySelector('.ff[data-key="' + k + '"]');
+            const ctrlShown = ctrl && ctrl.style.display !== "none";
+            if (!ctrlShown || !vals.includes(valueOf(k))) { visible = false; break; }
+          }
+          const disp = visible ? "" : "none";
+          if (el.style.display !== disp) { el.style.display = disp; changed = true; }
+        }
+        if (!changed) break;
+      }
+    }
+    form.addEventListener("change", recompute);
+    recompute();
+  })();
+</script>
 {% endblock %}
