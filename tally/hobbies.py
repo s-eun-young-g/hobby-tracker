@@ -60,6 +60,16 @@ class Hobby:
     def has_image(self) -> bool:
         return any(f.type == "image" for f in self.fields)
 
+    @property
+    def section(self) -> str:
+        """Two gallery shelves: image-bearing media vs games with cover art.
+
+        ``library`` is books, movies, papers, and dances (things with a real
+        cover or poster); ``games`` is everything in the game category, which
+        falls back to a generated placeholder cover.
+        """
+        return "games" if self.category == "game" else "library"
+
 
 def _date() -> Field:
     return Field("date", "Date", "date", "date")
@@ -153,3 +163,11 @@ def get(key: str) -> Optional[Hobby]:
 
 def daily_hobbies() -> list[Hobby]:
     return [h for h in HOBBIES.values() if h.daily]
+
+
+def library_hobbies() -> list[Hobby]:
+    return [h for h in HOBBIES.values() if h.section == "library"]
+
+
+def game_hobbies() -> list[Hobby]:
+    return [h for h in HOBBIES.values() if h.section == "games"]

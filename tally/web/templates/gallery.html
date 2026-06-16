@@ -1,54 +1,60 @@
 {% extends "base.html" %}
 {% block title %}Gallery - tally{% endblock %}
-{% block content %}
-<section class="card">
-  <h1>Gallery</h1>
-  <div class="chips">
-    <a class="chip {{ 'on' if not active }}" href="/gallery">All</a>
-    {% for h in hobbies %}
-    <a class="chip {{ 'on' if active == h.key }}" href="/gallery?hobby={{ h.key }}">{{ h.label }}</a>
-    {% endfor %}
-  </div>
 
-  {% if not entries %}
-  <p class="muted">Nothing logged yet. Add something from the Today page.</p>
-  {% else %}
-  <div class="cards">
-    {% for e in entries %}
-    {% set h = get(e.hobby) %}
-    <figure class="g-card">
-      {% if e.image_path %}
-        <img src="/uploads/{{ e.image_path }}" alt="{{ e.title }}">
-      {% elif e.image_url %}
-        <img src="{{ e.image_url }}" alt="{{ e.title }}">
-      {% else %}
-        <div class="g-tile" style="background:{{ h.color if h else '#444' }}">
-          <span class="g-kind">{{ h.label if h else e.hobby }}</span>
-          {% if e.score is not none %}
-          <span class="g-score">{{ minsec(e.score) if h and h.score_is_time else scorefmt(e.score) }}</span>
-          {% endif %}
-        </div>
-      {% endif %}
-      <figcaption>
-        <b>{{ e.title or (h.label if h else e.hobby) }}</b>
-        <span class="g-meta">
-          {{ e.date }}
-          {% if e.rating %}, {{ e.rating }}/5{% endif %}
-          {% for k, v in (e.data or {}).items() %}{% if v %}, {{ v }}{% endif %}{% endfor %}
-          {% if e.score is not none and h and h.score_label %}
-           , {{ (minsec(e.score) if h.score_is_time else scorefmt(e.score)) }}{{ '' if h.score_is_time else ' ' ~ h.score_label }}
-          {% endif %}
-        </span>
-        <span class="g-actions">
-          <a href="/edit/{{ e.id }}">edit</a>
-          {% if e.link %}<a href="{{ e.link }}" target="_blank">link</a>{% endif %}
-          <form method="post" action="/entry/{{ e.id }}/delete"
-                onsubmit="return confirm('Delete this entry?')"><button>delete</button></form>
-        </span>
-      </figcaption>
-    </figure>
-    {% endfor %}
+{% macro card(e) %}
+{% set h = get(e.hobby) %}
+<figure class="g-card">
+  <div class="g-cover{{ ' is-game' if e.is_game }}" style="background-image:url('{{ e.img }}')">
+    {% if e.is_game and e.score is not none %}
+    <span class="g-score">{{ minsec(e.score) if h and h.score_is_time else scorefmt(e.score) }}</span>
+    {% endif %}
   </div>
-  {% endif %}
+  <figcaption>
+    <b>{{ e.title or (h.label if h else e.hobby) }}</b>
+    <span class="g-meta">
+      {{ e.date }}
+      {% if e.rating %}, {{ e.rating }}/5{% endif %}
+      {% for k, v in (e.data or {}).items() %}{% if v %}, {{ v }}{% endif %}{% endfor %}
+      {% if e.score is not none and h and h.score_label %}
+       , {{ (minsec(e.score) if h.score_is_time else scorefmt(e.score)) }}{{ '' if h.score_is_time else ' ' ~ h.score_label }}
+      {% endif %}
+    </span>
+    <span class="g-actions">
+      <a href="/edit/{{ e.id }}">edit</a>
+      {% if e.link %}<a href="{{ e.link }}" target="_blank">link</a>{% endif %}
+      <form method="post" action="/entry/{{ e.id }}/delete"
+            onsubmit="return confirm('Delete this entry?')"><button>delete</button></form>
+    </span>
+  </figcaption>
+</figure>
+{% endmacro %}
+
+{% macro shelf(title, section, hobbies, entries) %}
+<section class="window">
+  <header class="titlebar"><span class="lights"></span><span class="t-title">{{ title }}</span></header>
+  <div class="win-body">
+    <div class="chips">
+      <a class="chip {{ 'on' if active_section != section or not active }}" href="/gallery">All</a>
+      {% for h in hobbies %}
+      <a class="chip {{ 'on' if active == h.key }}" href="/gallery?hobby={{ h.key }}">{{ h.label }}</a>
+      {% endfor %}
+    </div>
+    {% if not entries %}
+    <p class="muted">Nothing here yet. Add something from the Today page.</p>
+    {% else %}
+    <div class="cards">
+      {% for e in entries %}{{ card(e) }}{% endfor %}
+    </div>
+    {% endif %}
+  </div>
 </section>
+{% endmacro %}
+
+{% block content %}
+{% if active_section in (none, "library") %}
+  {{ shelf("Library", "library", lib_hobbies, library) }}
+{% endif %}
+{% if active_section in (none, "games") %}
+  {{ shelf("Arcade", "games", game_hobbies, games) }}
+{% endif %}
 {% endblock %}

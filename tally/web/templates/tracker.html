@@ -1,32 +1,36 @@
 {% extends "base.html" %}
 {% block title %}Tracker - tally{% endblock %}
 {% block content %}
-<section class="card">
-  <h1>Tracker</h1>
-  <div class="heatmap">
-    {% for day, count in heatmap %}
-    <span class="cell lvl-{{ 3 if count >= 3 else count }}" title="{{ day }}: {{ count }}"></span>
-    {% endfor %}
+<section class="window">
+  <header class="titlebar"><span class="lights"></span><span class="t-title">Tracker</span></header>
+  <div class="win-body">
+    <div class="heatmap">
+      {% for day, count in heatmap %}
+      <span class="cell lvl-{{ 3 if count >= 3 else count }}" title="{{ day }}: {{ count }}"></span>
+      {% endfor %}
+    </div>
+    <p class="muted small">Last 84 days, all hobbies. Darker means more entries that day.</p>
   </div>
-  <p class="muted small">Last 84 days, all hobbies. Darker means more entries that day.</p>
 </section>
 
-<section class="card">
-  <h2>By hobby</h2>
-  <table class="grid">
-    <thead><tr><th>Hobby</th><th>Entries</th><th>Streak</th><th>Longest</th><th>Best</th><th>Last</th></tr></thead>
-    <tbody>
-      {% for c in cards %}
-      <tr>
-        <td><span class="dot" style="background:{{ c.hobby.color }}"></span>{{ c.hobby.label }}</td>
-        <td>{{ c.total }}</td>
-        <td>{{ (c.streak ~ ' d') if c.streak is not none else '-' }}</td>
-        <td>{{ (c.longest ~ ' d') if c.longest is not none else '-' }}</td>
-        <td>{% if c.best is not none %}{{ minsec(c.best) if c.hobby.score_is_time else scorefmt(c.best) }}{{ '' if c.hobby.score_is_time else ' ' ~ (c.hobby.score_label or '') }}{% else %}-{% endif %}</td>
-        <td>{{ c.last or '-' }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<section class="window">
+  <header class="titlebar"><span class="lights"></span><span class="t-title">By hobby</span></header>
+  <div class="win-body">
+    <table class="grid">
+      <thead><tr><th>Hobby</th><th>Entries</th><th>Streak</th><th>Longest</th><th>Best</th><th>Last</th></tr></thead>
+      <tbody>
+        {% for c in cards %}
+        <tr>
+          <td><span class="dot" style="background:{{ c.hobby.color }}"></span>{{ c.hobby.label }}</td>
+          <td>{{ c.total }}</td>
+          <td>{{ (c.streak ~ ' d') if c.streak is not none else '-' }}</td>
+          <td>{{ (c.longest ~ ' d') if c.longest is not none else '-' }}</td>
+          <td>{% if c.best is not none %}{{ minsec(c.best) if c.hobby.score_is_time else scorefmt(c.best) }}{{ '' if c.hobby.score_is_time else ' ' ~ (c.hobby.score_label or '') }}{% else %}-{% endif %}</td>
+          <td>{{ c.last or '-' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </section>
 {% endblock %}

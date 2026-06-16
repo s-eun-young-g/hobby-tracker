@@ -9,7 +9,7 @@ from typing import Optional
 from uuid import uuid4
 
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -17,16 +17,37 @@ from .. import hobbies as H
 from ..config import settings
 from ..db import DB
 from ..stats import best_score, current_streak, heatmap, longest_streak
+from . import covers
 
 BASE = Path(__file__).parent
 UPLOADS = settings.data_dir / "uploads"
 UPLOADS.mkdir(parents=True, exist_ok=True)
+COVERS = BASE / "static" / "covers"
+COVERS.mkdir(parents=True, exist_ok=True)
+COVER_EXTS = (".png", ".jpg", ".jpeg", ".webp", ".svg")
 
 app = FastAPI(title="tally")
 templates = Jinja2Templates(directory=str(BASE / "templates"))
 app.mount("/static", StaticFiles(directory=str(BASE / "static")), name="static")
 app.mount("/uploads", StaticFiles(directory=str(UPLOADS)), name="uploads")
 db = DB(settings.db_path)
+
+
+def _cover_url(key: str) -> str:
+    """User-supplied cover at static/covers/<key>.<ext> wins; else generated SVG."""
+    for ext in COVER_EXTS:
+        if (COVERS / f"{key}{ext}").exists():
+            return f"/static/covers/{key}{ext}"
+    return f"/cover/{key}.svg"
+
+
+def _entry_image(entry: dict) -> str:
+    """The poster/cover to show for an entry: upload, pasted URL, or placeholder."""
+    if entry.get("image_path"):
+        return f"/uploads/{entry['image_path']}"
+    if entry.get("image_url"):
+        return entry["image_url"]
+    return _cover_url(entry["hobby"])
 
 # make helpers available in templates
 templates.env.globals["minsec"] = lambda s: (
@@ -218,12 +239,26 @@ def tracker(request: Request):
     return templates.TemplateResponse(request, "tracker.html", {"cards": cards, "heatmap": hm})
 
 
+@app.get("/cover/{hobby}.svg")
+def cover(hobby: str):
+    return Response(covers.cover_svg(hobby), media_type="image/svg+xml",
+                    headers={"Cache-Control": "no-cache"})
+
+
 @app.get("/gallery", response_class=HTMLResponse)
 def gallery(request: Request, hobby: str = ""):
     entries = db.entries(hobby or None, limit=400)
+    for e in entries:
+        e["img"] = _entry_image(e)
+        h = H.get(e["hobby"])
+        e["is_game"] = bool(h and h.section == "games")
+    active = H.get(hobby) if hobby else None
     return templates.TemplateResponse(request, "gallery.html", {
-        "entries": entries, "hobbies": list(H.HOBBIES.values()),
-        "active": hobby, "get": H.get})
+        "library": [e for e in entries if not e["is_game"]],
+        "games": [e for e in entries if e["is_game"]],
+        "lib_hobbies": H.library_hobbies(), "game_hobbies": H.game_hobbies(),
+        "active": hobby, "active_section": (active.section if active else None),
+        "get": H.get})
 
 
 def main():

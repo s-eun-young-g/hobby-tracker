@@ -1,27 +1,31 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="card">
-  <h1>Today</h1>
-  <p class="muted">Daily games. The streak counts consecutive days you logged.</p>
-  <ul class="daily">
-    {% for row in daily %}
-    <li>
-      <span class="d-name">{{ row.hobby.label }}</span>
-      <span class="d-streak">{{ row.streak }} day streak</span>
-      <a class="btn" href="/add/{{ row.hobby.key }}">Log today</a>
-    </li>
-    {% endfor %}
-  </ul>
+<section class="window">
+  <header class="titlebar"><span class="lights"></span><span class="t-title">Today</span></header>
+  <div class="win-body">
+    <p class="muted">Daily games. The streak counts consecutive days you logged.</p>
+    <ul class="daily">
+      {% for row in daily %}
+      <li>
+        <span class="d-name">{{ row.hobby.label }}</span>
+        <span class="d-streak">{{ row.streak }} day streak</span>
+        <a class="btn" href="/add/{{ row.hobby.key }}">Log today</a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
 </section>
 
-<section class="card">
-  <h2>Add anything</h2>
-  <div class="add-grid">
-    {% for h in hobbies %}
-    <a class="add-btn" href="/add/{{ h.key }}" style="border-color:{{ h.color }}">
-      <span class="ab-dot" style="background:{{ h.color }}"></span>{{ h.label }}
-    </a>
-    {% endfor %}
+<section class="window">
+  <header class="titlebar"><span class="lights"></span><span class="t-title">Add anything</span></header>
+  <div class="win-body">
+    <div class="add-grid">
+      {% for h in hobbies %}
+      <a class="add-btn" href="/add/{{ h.key }}" style="border-color:{{ h.color }}">
+        <span class="ab-dot" style="background:{{ h.color }}"></span>{{ h.label }}
+      </a>
+      {% endfor %}
+    </div>
   </div>
 </section>
 {% endblock %}
