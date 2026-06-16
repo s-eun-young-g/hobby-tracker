@@ -8,11 +8,6 @@ grid of covers, posters, and score cards).
 
 ![tally gallery view](docs/gallery.png)
 
-Most of these hobbies are closed apps with no API or export, so v1 is manual: a fast
-one-tap log for daily games and a short form for everything else. The logging is the
-habit. Auto-import for the few open sources (Letterboxd, Goodreads, papers) can come
-later.
-
 ## Run it
 
 Easiest: double-click `run.command` in Finder. It sets things up on first run, starts
