@@ -1,12 +1,9 @@
 """Generated SVG placeholder covers for entries that have no artwork.
 
 Games (and papers) have no per-entry image, so the gallery falls back to one of
-these. A cover is drawn in whatever colour the caller passes (the active palette
-accent for games, the hobby's own colour otherwise). To replace a placeholder
-with real box art, drop a file under ``tally/web/static/covers/`` and it wins:
-
-    static/covers/<theme>/<hobby>.png   palette-specific stock art (preferred)
-    static/covers/<hobby>.png           one image used for every palette
+these. A cover is drawn in whatever colour the caller passes (the neutral accent
+for games, the hobby's own colour otherwise). To replace a placeholder with real
+box art, drop a file at ``tally/web/static/covers/<hobby>.png`` and it wins.
 
 Fonts are kept to generic ``sans-serif`` on purpose: an SVG loaded through an
 <img>/background cannot pull in a web font, so we lean on what is installed.

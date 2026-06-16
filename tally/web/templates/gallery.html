@@ -7,8 +7,7 @@
   {% if e.img %}
   <div class="g-cover" style="background-image:url('{{ e.img }}')">
   {% elif e.is_game %}
-  <div class="g-cover is-game" data-cover="{{ e.hobby }}"
-       style="background-image:url('/cover/{{ e.hobby }}?theme={{ default_theme }}')">
+  <div class="g-cover is-game" style="background-image:url('/cover/{{ e.hobby }}')">
   {% else %}
   <div class="g-cover" style="background-image:url('/cover/{{ e.hobby }}')">
   {% endif %}

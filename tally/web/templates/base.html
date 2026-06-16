@@ -4,18 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}tally{% endblock %}</title>
-  <script>
-    // Apply the saved palette before first paint so there is no colour flash.
-    (function () {
-      try {
-        var t = localStorage.getItem("tally-theme") || "blue";
-        document.documentElement.setAttribute("data-theme", t);
-      } catch (e) { document.documentElement.setAttribute("data-theme", "blue"); }
-    })();
-  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 </head>
@@ -28,49 +19,12 @@
       <a href="/gallery">Gallery</a>
     </nav>
     <div class="topbar-right">
-      <div class="themes" role="group" aria-label="Colour palette">
-        <button class="swatch" data-theme="red" style="--s:#f2a6a4" title="Red"></button>
-        <button class="swatch" data-theme="orange" style="--s:#f6c098" title="Orange"></button>
-        <button class="swatch" data-theme="yellow" style="--s:#f4dd8e" title="Yellow"></button>
-        <button class="swatch" data-theme="green" style="--s:#a8d8b9" title="Green"></button>
-        <button class="swatch" data-theme="blue" style="--s:#9fc7ec" title="Blue"></button>
-        <button class="swatch" data-theme="indigo" style="--s:#b3b6ef" title="Indigo"></button>
-        <button class="swatch" data-theme="violet" style="--s:#cda9e8" title="Violet"></button>
-      </div>
       <span id="clock" aria-hidden="true"></span>
     </div>
   </header>
   <main>{% block content %}{% endblock %}</main>
 
   <script>
-    // Palette switcher: persist the choice and mark the active swatch.
-    (function () {
-      var root = document.documentElement;
-      var swatches = Array.prototype.slice.call(document.querySelectorAll(".swatch"));
-      function mark() {
-        var cur = root.getAttribute("data-theme");
-        swatches.forEach(function (s) {
-          s.setAttribute("aria-pressed", String(s.dataset.theme === cur));
-        });
-      }
-      // Game covers are palette-specific: re-point each one at the current theme.
-      function applyCovers(theme) {
-        document.querySelectorAll("[data-cover]").forEach(function (el) {
-          el.style.backgroundImage =
-            "url('/cover/" + el.dataset.cover + "?theme=" + theme + "')";
-        });
-      }
-      swatches.forEach(function (s) {
-        s.addEventListener("click", function () {
-          root.setAttribute("data-theme", s.dataset.theme);
-          try { localStorage.setItem("tally-theme", s.dataset.theme); } catch (e) {}
-          mark();
-          applyCovers(s.dataset.theme);
-        });
-      });
-      mark();
-      applyCovers(root.getAttribute("data-theme") || "blue");
-    })();
     // Little menu-bar clock, for the retro-desktop feel.
     (function () {
       var el = document.getElementById("clock");

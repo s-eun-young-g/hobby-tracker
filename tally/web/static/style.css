@@ -6,27 +6,17 @@
   --ink:#15130f;           /* near-black outline/text */
   --muted:#6f6557;
   --line:#15130f;
-  /* TT Commons Pro if installed locally; Hanken Grotesk (Google) is the fallback. */
-  --sans:"TT Commons Pro", "TT Commons", "Hanken Grotesk", ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --sans:"Bricolage Grotesque", ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif;
   --mono:ui-monospace, SFMono-Regular, Menlo, monospace;
   --shadow:5px 5px 0 var(--ink);
   --shadow-sm:3px 3px 0 var(--ink);
 
-  /* default palette: pastel blue (overridden by [data-theme=...] below).
-     Pastels are light, so text on an accent fill (--on-accent) is dark. */
-  --accent:#9fc7ec;
-  --accent-ink:#3f73a8;     /* readable accent for text/links on cream */
-  --on-accent:#1c2533;      /* text that sits on an accent fill */
-  --accent-soft:#e0eefb;    /* faint tint for fills and the desktop blobs */
+  /* single neutral scheme: warm stone accent on cream, dark text on the accent. */
+  --accent:#c7bca3;
+  --accent-ink:#6b6049;     /* readable accent for text/links on cream */
+  --on-accent:#2a251c;      /* text that sits on an accent fill */
+  --accent-soft:#e7e1d2;    /* faint tint for fills and the desktop blobs */
 }
-
-[data-theme="red"]    { --accent:#f2a6a4; --accent-ink:#b5524f; --on-accent:#3a2120; --accent-soft:#fbe2e1; }
-[data-theme="orange"] { --accent:#f6c098; --accent-ink:#b9712f; --on-accent:#3a2a18; --accent-soft:#fce8d8; }
-[data-theme="yellow"] { --accent:#f4dd8e; --accent-ink:#8a6d11; --on-accent:#3a3212; --accent-soft:#fbf3d4; }
-[data-theme="green"]  { --accent:#a8d8b9; --accent-ink:#3f7d5a; --on-accent:#1e3527; --accent-soft:#ddf0e4; }
-[data-theme="blue"]   { --accent:#9fc7ec; --accent-ink:#3f73a8; --on-accent:#1c2533; --accent-soft:#e0eefb; }
-[data-theme="indigo"] { --accent:#b3b6ef; --accent-ink:#5159c0; --on-accent:#232652; --accent-soft:#e4e5fb; }
-[data-theme="violet"] { --accent:#cda9e8; --accent-ink:#8246b8; --on-accent:#2f1c42; --accent-soft:#efe2fa; }
 
 * { box-sizing:border-box; }
 body {
@@ -64,12 +54,6 @@ nav a {
 }
 nav a:hover { border-color:var(--ink); background:var(--accent-soft); }
 .topbar-right { margin-left:auto; display:flex; align-items:center; gap:.9rem; }
-.themes { display:flex; gap:.34rem; }
-.swatch {
-  width:16px; height:16px; padding:0; border-radius:50%; border:2px solid var(--ink);
-  background:var(--s); cursor:pointer; box-shadow:none;
-}
-.swatch[aria-pressed="true"] { outline:2px solid var(--ink); outline-offset:2px; }
 #clock { font-size:.78rem; color:var(--muted); white-space:nowrap; }
 
 main { max-width:940px; margin:1.5rem auto; padding:0 1rem; }

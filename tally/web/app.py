@@ -23,22 +23,11 @@ BASE = Path(__file__).parent
 UPLOADS = settings.data_dir / "uploads"
 UPLOADS.mkdir(parents=True, exist_ok=True)
 COVERS = BASE / "static" / "covers"
+COVERS.mkdir(parents=True, exist_ok=True)
 COVER_EXTS = (".png", ".jpg", ".jpeg", ".webp", ".svg")
 
-# Pastel ROYGBIV accents, mirrored in static/style.css so generated covers match
-# the active palette. Game covers recolour with the theme; the picker lives in the
-# top bar and passes the chosen theme to /cover/<hobby>.
-THEME_ACCENT = {
-    "red": "#f2a6a4", "orange": "#f6c098", "yellow": "#f4dd8e",
-    "green": "#a8d8b9", "blue": "#9fc7ec", "indigo": "#b3b6ef",
-    "violet": "#cda9e8",
-}
-DEFAULT_THEME = "blue"
-
-# stock-art folders the user can fill: one per palette, plus a theme-agnostic root
-COVERS.mkdir(parents=True, exist_ok=True)
-for _t in THEME_ACCENT:
-    (COVERS / _t).mkdir(parents=True, exist_ok=True)
+# Neutral accent for generated game covers (mirrors --accent in static/style.css).
+COVER_ACCENT = "#c7bca3"
 
 app = FastAPI(title="tally")
 templates = Jinja2Templates(directory=str(BASE / "templates"))
@@ -47,13 +36,8 @@ app.mount("/uploads", StaticFiles(directory=str(UPLOADS)), name="uploads")
 db = DB(settings.db_path)
 
 
-def _cover_file(key: str, theme: str):
-    """Stock cover for this hobby: palette-specific art first, then theme-agnostic."""
-    if theme:
-        for ext in COVER_EXTS:
-            p = COVERS / theme / f"{key}{ext}"
-            if p.exists():
-                return p
+def _cover_file(key: str):
+    """A user-supplied stock cover at static/covers/<key>.<ext>, or None."""
     for ext in COVER_EXTS:
         p = COVERS / f"{key}{ext}"
         if p.exists():
@@ -260,16 +244,14 @@ def tracker(request: Request):
 
 
 @app.get("/cover/{hobby}")
-def cover(hobby: str, theme: str = ""):
-    """A cover for a hobby, recoloured to the requested palette when generated."""
-    theme = theme if theme in THEME_ACCENT else DEFAULT_THEME
-    f = _cover_file(hobby, theme)
+def cover(hobby: str):
+    """A cover for a hobby: the user's stock art if present, else a generated one."""
+    f = _cover_file(hobby)
     if f:
         return FileResponse(f, headers={"Cache-Control": "no-cache"})
     h = H.get(hobby)
-    # games take the active palette accent; library covers keep their hobby colour
-    color = THEME_ACCENT[theme] if (h and h.section == "games") else (
-        h.color if h else THEME_ACCENT[theme])
+    # games get the neutral accent; library covers keep their hobby colour
+    color = COVER_ACCENT if (h and h.section == "games") else (h.color if h else COVER_ACCENT)
     return Response(covers.cover_svg(hobby, color), media_type="image/svg+xml",
                     headers={"Cache-Control": "no-cache"})
 
@@ -287,7 +269,7 @@ def gallery(request: Request, hobby: str = ""):
         "games": [e for e in entries if e["is_game"]],
         "lib_hobbies": H.library_hobbies(), "game_hobbies": H.game_hobbies(),
         "active": hobby, "active_section": (active.section if active else None),
-        "default_theme": DEFAULT_THEME, "get": H.get})
+        "get": H.get})
 
 
 def main():
