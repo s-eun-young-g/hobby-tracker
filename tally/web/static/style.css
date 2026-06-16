@@ -12,20 +12,21 @@
   --shadow:5px 5px 0 var(--ink);
   --shadow-sm:3px 3px 0 var(--ink);
 
-  /* default palette: blue (overridden by [data-theme=...] below) */
-  --accent:#1f86d6;
-  --accent-ink:#176bb0;    /* readable accent for text/links on cream */
-  --on-accent:#fffdf8;     /* text that sits on an accent fill */
-  --accent-soft:#d7ecfb;   /* faint tint for fills and the desktop blobs */
+  /* default palette: pastel blue (overridden by [data-theme=...] below).
+     Pastels are light, so text on an accent fill (--on-accent) is dark. */
+  --accent:#9fc7ec;
+  --accent-ink:#3f73a8;     /* readable accent for text/links on cream */
+  --on-accent:#1c2533;      /* text that sits on an accent fill */
+  --accent-soft:#e0eefb;    /* faint tint for fills and the desktop blobs */
 }
 
-[data-theme="red"]    { --accent:#e5484d; --accent-ink:#c2282d; --on-accent:#fffdf8; --accent-soft:#fbdcdd; }
-[data-theme="orange"] { --accent:#ef7d2e; --accent-ink:#c75a12; --on-accent:#fffdf8; --accent-soft:#fbe4d1; }
-[data-theme="yellow"] { --accent:#f4c20d; --accent-ink:#8a6d00; --on-accent:#2a2410; --accent-soft:#fbeeb8; }
-[data-theme="green"]  { --accent:#2f9e63; --accent-ink:#1f7a4a; --on-accent:#fffdf8; --accent-soft:#d2efe0; }
-[data-theme="blue"]   { --accent:#1f86d6; --accent-ink:#176bb0; --on-accent:#fffdf8; --accent-soft:#d7ecfb; }
-[data-theme="indigo"] { --accent:#4b53d8; --accent-ink:#3a40b8; --on-accent:#fffdf8; --accent-soft:#dcdefb; }
-[data-theme="violet"] { --accent:#9b51e0; --accent-ink:#7a36b8; --on-accent:#fffdf8; --accent-soft:#ebdcfb; }
+[data-theme="red"]    { --accent:#f2a6a4; --accent-ink:#b5524f; --on-accent:#3a2120; --accent-soft:#fbe2e1; }
+[data-theme="orange"] { --accent:#f6c098; --accent-ink:#b9712f; --on-accent:#3a2a18; --accent-soft:#fce8d8; }
+[data-theme="yellow"] { --accent:#f4dd8e; --accent-ink:#8a6d11; --on-accent:#3a3212; --accent-soft:#fbf3d4; }
+[data-theme="green"]  { --accent:#a8d8b9; --accent-ink:#3f7d5a; --on-accent:#1e3527; --accent-soft:#ddf0e4; }
+[data-theme="blue"]   { --accent:#9fc7ec; --accent-ink:#3f73a8; --on-accent:#1c2533; --accent-soft:#e0eefb; }
+[data-theme="indigo"] { --accent:#b3b6ef; --accent-ink:#5159c0; --on-accent:#232652; --accent-soft:#e4e5fb; }
+[data-theme="violet"] { --accent:#cda9e8; --accent-ink:#8246b8; --on-accent:#2f1c42; --accent-soft:#efe2fa; }
 
 * { box-sizing:border-box; }
 body {
@@ -68,7 +69,6 @@ nav a:hover { border-color:var(--ink); background:var(--accent-soft); }
   width:16px; height:16px; padding:0; border-radius:50%; border:2px solid var(--ink);
   background:var(--s); cursor:pointer; box-shadow:none;
 }
-.swatch:hover { transform:translateY(-1px); }
 .swatch[aria-pressed="true"] { outline:2px solid var(--ink); outline-offset:2px; }
 #clock { font-size:.78rem; color:var(--muted); white-space:nowrap; }
 
@@ -87,15 +87,13 @@ main { max-width:940px; margin:1.5rem auto; padding:0 1rem; }
 .t-title {
   color:var(--on-accent); font-size:.92rem; font-weight:700; letter-spacing:.02em;
 }
-/* a circle + a heart on the left of the title bar (outlined window controls) */
+/* a circle + a heart on the left of the title bar (outlined window controls).
+   Both shapes live in one SVG so they share the exact same stroke weight/style. */
 .lights {
-  position:absolute; left:.9rem; top:50%; transform:translateY(-50%);
-  width:13px; height:13px; border-radius:50%; background:var(--paper); border:2px solid var(--ink);
-}
-.lights::after {
-  content:""; position:absolute; left:20px; top:50%; transform:translateY(-50%);
-  width:15px; height:14px; background-repeat:no-repeat; background-position:center; background-size:contain;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 29.6'%3E%3Cpath d='M23.6 0c-3.4 0-6.3 2.7-7.6 5.6C14.7 2.7 11.8 0 8.4 0 3.8 0 0 3.8 0 8.4c0 9.4 9.5 11.9 16 21.2 6.1-9.3 16-12.1 16-21.2C32 3.8 28.2 0 23.6 0z' fill='%23fffdf8' stroke='%2315130f' stroke-width='2.5'/%3E%3C/svg%3E");
+  position:absolute; left:.85rem; top:50%; transform:translateY(-50%);
+  width:40px; height:18px;
+  background-repeat:no-repeat; background-position:left center; background-size:contain;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 18'%3E%3Ccircle cx='8' cy='9' r='6' fill='%23fffdf8' stroke='%2315130f' stroke-width='2'/%3E%3Cg transform='translate(19 2.2) scale(0.44)' fill='%23fffdf8' stroke='%2315130f' stroke-width='4.5' stroke-linejoin='round'%3E%3Cpath d='M23.6 0c-3.4 0-6.3 2.7-7.6 5.6C14.7 2.7 11.8 0 8.4 0 3.8 0 0 3.8 0 8.4c0 9.4 9.5 11.9 16 21.2 6.1-9.3 16-12.1 16-21.2C32 3.8 28.2 0 23.6 0z'/%3E%3C/g%3E%3C/svg%3E");
 }
 .win-body { padding:1.15rem 1.3rem; }
 

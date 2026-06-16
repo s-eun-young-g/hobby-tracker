@@ -4,7 +4,14 @@
 {% macro card(e) %}
 {% set h = get(e.hobby) %}
 <figure class="g-card">
-  <div class="g-cover{{ ' is-game' if e.is_game }}" style="background-image:url('{{ e.img }}')">
+  {% if e.img %}
+  <div class="g-cover" style="background-image:url('{{ e.img }}')">
+  {% elif e.is_game %}
+  <div class="g-cover is-game" data-cover="{{ e.hobby }}"
+       style="background-image:url('/cover/{{ e.hobby }}?theme={{ default_theme }}')">
+  {% else %}
+  <div class="g-cover" style="background-image:url('/cover/{{ e.hobby }}')">
+  {% endif %}
     {% if e.is_game and e.score is not none %}
     <span class="g-score">{{ minsec(e.score) if h and h.score_is_time else scorefmt(e.score) }}</span>
     {% endif %}

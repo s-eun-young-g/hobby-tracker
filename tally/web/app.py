@@ -9,7 +9,7 @@ from typing import Optional
 from uuid import uuid4
 
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, RedirectResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -23,8 +23,22 @@ BASE = Path(__file__).parent
 UPLOADS = settings.data_dir / "uploads"
 UPLOADS.mkdir(parents=True, exist_ok=True)
 COVERS = BASE / "static" / "covers"
-COVERS.mkdir(parents=True, exist_ok=True)
 COVER_EXTS = (".png", ".jpg", ".jpeg", ".webp", ".svg")
+
+# Pastel ROYGBIV accents, mirrored in static/style.css so generated covers match
+# the active palette. Game covers recolour with the theme; the picker lives in the
+# top bar and passes the chosen theme to /cover/<hobby>.
+THEME_ACCENT = {
+    "red": "#f2a6a4", "orange": "#f6c098", "yellow": "#f4dd8e",
+    "green": "#a8d8b9", "blue": "#9fc7ec", "indigo": "#b3b6ef",
+    "violet": "#cda9e8",
+}
+DEFAULT_THEME = "blue"
+
+# stock-art folders the user can fill: one per palette, plus a theme-agnostic root
+COVERS.mkdir(parents=True, exist_ok=True)
+for _t in THEME_ACCENT:
+    (COVERS / _t).mkdir(parents=True, exist_ok=True)
 
 app = FastAPI(title="tally")
 templates = Jinja2Templates(directory=str(BASE / "templates"))
@@ -33,21 +47,27 @@ app.mount("/uploads", StaticFiles(directory=str(UPLOADS)), name="uploads")
 db = DB(settings.db_path)
 
 
-def _cover_url(key: str) -> str:
-    """User-supplied cover at static/covers/<key>.<ext> wins; else generated SVG."""
+def _cover_file(key: str, theme: str):
+    """Stock cover for this hobby: palette-specific art first, then theme-agnostic."""
+    if theme:
+        for ext in COVER_EXTS:
+            p = COVERS / theme / f"{key}{ext}"
+            if p.exists():
+                return p
     for ext in COVER_EXTS:
-        if (COVERS / f"{key}{ext}").exists():
-            return f"/static/covers/{key}{ext}"
-    return f"/cover/{key}.svg"
+        p = COVERS / f"{key}{ext}"
+        if p.exists():
+            return p
+    return None
 
 
-def _entry_image(entry: dict) -> str:
-    """The poster/cover to show for an entry: upload, pasted URL, or placeholder."""
+def _entry_upload(entry: dict) -> str:
+    """The user's own poster for an entry (upload or pasted URL), or '' if none."""
     if entry.get("image_path"):
         return f"/uploads/{entry['image_path']}"
     if entry.get("image_url"):
         return entry["image_url"]
-    return _cover_url(entry["hobby"])
+    return ""
 
 # make helpers available in templates
 templates.env.globals["minsec"] = lambda s: (
@@ -239,9 +259,18 @@ def tracker(request: Request):
     return templates.TemplateResponse(request, "tracker.html", {"cards": cards, "heatmap": hm})
 
 
-@app.get("/cover/{hobby}.svg")
-def cover(hobby: str):
-    return Response(covers.cover_svg(hobby), media_type="image/svg+xml",
+@app.get("/cover/{hobby}")
+def cover(hobby: str, theme: str = ""):
+    """A cover for a hobby, recoloured to the requested palette when generated."""
+    theme = theme if theme in THEME_ACCENT else DEFAULT_THEME
+    f = _cover_file(hobby, theme)
+    if f:
+        return FileResponse(f, headers={"Cache-Control": "no-cache"})
+    h = H.get(hobby)
+    # games take the active palette accent; library covers keep their hobby colour
+    color = THEME_ACCENT[theme] if (h and h.section == "games") else (
+        h.color if h else THEME_ACCENT[theme])
+    return Response(covers.cover_svg(hobby, color), media_type="image/svg+xml",
                     headers={"Cache-Control": "no-cache"})
 
 
@@ -249,7 +278,7 @@ def cover(hobby: str):
 def gallery(request: Request, hobby: str = ""):
     entries = db.entries(hobby or None, limit=400)
     for e in entries:
-        e["img"] = _entry_image(e)
+        e["img"] = _entry_upload(e)
         h = H.get(e["hobby"])
         e["is_game"] = bool(h and h.section == "games")
     active = H.get(hobby) if hobby else None
@@ -258,7 +287,7 @@ def gallery(request: Request, hobby: str = ""):
         "games": [e for e in entries if e["is_game"]],
         "lib_hobbies": H.library_hobbies(), "game_hobbies": H.game_hobbies(),
         "active": hobby, "active_section": (active.section if active else None),
-        "get": H.get})
+        "default_theme": DEFAULT_THEME, "get": H.get})
 
 
 def main():

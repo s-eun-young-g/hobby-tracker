@@ -1,12 +1,15 @@
 """Generated SVG placeholder covers for entries that have no artwork.
 
 Games (and papers) have no per-entry image, so the gallery falls back to one of
-these. Each cover is drawn in the hobby's own signature colour so the wall still
-looks varied. To replace a placeholder with real box art, drop a file at
-``tally/web/static/covers/<hobby>.png`` (jpg/webp/svg also work) and it wins.
+these. A cover is drawn in whatever colour the caller passes (the active palette
+accent for games, the hobby's own colour otherwise). To replace a placeholder
+with real box art, drop a file under ``tally/web/static/covers/`` and it wins:
 
-Fonts are kept to generic ``monospace``/``sans-serif`` on purpose: an SVG loaded
-through an <img> tag cannot pull in a web font, so we lean on what is installed.
+    static/covers/<theme>/<hobby>.png   palette-specific stock art (preferred)
+    static/covers/<hobby>.png           one image used for every palette
+
+Fonts are kept to generic ``sans-serif`` on purpose: an SVG loaded through an
+<img>/background cannot pull in a web font, so we lean on what is installed.
 """
 
 from __future__ import annotations
@@ -26,10 +29,20 @@ MUTED = "#6f6557"
 FAINT = "#9a8f7d"
 
 
-def cover_svg(key: str) -> str:
+def _text_on(hex_color: str) -> str:
+    """Pick ink or paper for text sitting on ``hex_color`` (by luminance)."""
+    h = hex_color.lstrip("#")
+    if len(h) != 6:
+        return INK
+    r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+    return INK if (0.299 * r + 0.587 * g + 0.114 * b) > 150 else PAPER
+
+
+def cover_svg(key: str, color: str | None = None) -> str:
     """Return an SVG document (2:3 poster) standing in for a missing cover."""
     h = H.get(key)
-    color = h.color if h else "#1f86d6"
+    color = color or (h.color if h else "#9fc7ec")
+    fg = _text_on(color)
     label = (h.label if h else key.replace("_", " ")).upper()
     mono = _MONO.get(key, label[:1])
     mono_size = 64 if len(mono) == 1 else 42
@@ -41,20 +54,20 @@ def cover_svg(key: str) -> str:
         f'<rect width="300" height="450" fill="{PAPER}"/>'
         '<g clip-path="url(#w)">'
         f'<rect x="12" y="12" width="276" height="426" fill="{PAPER}"/>'
-        # title bar in the hobby colour, with an outlined circle + heart
+        # title bar in the cover colour, with an outlined circle + heart
         f'<rect x="12" y="12" width="276" height="42" fill="{color}"/>'
-        f'<circle cx="33" cy="33" r="5.5" fill="{PAPER}" stroke="{INK}" stroke-width="2"/>'
-        '<g transform="translate(45.5 27) scale(0.42)">'
+        f'<circle cx="33" cy="33" r="6" fill="{PAPER}" stroke="{INK}" stroke-width="2"/>'
+        f'<g transform="translate(44 26.5) scale(0.44)" fill="{PAPER}" stroke="{INK}" '
+        'stroke-width="4.5" stroke-linejoin="round">'
         '<path d="M23.6 0c-3.4 0-6.3 2.7-7.6 5.6C14.7 2.7 11.8 0 8.4 0 3.8 0 0 3.8 0 8.4'
-        'c0 9.4 9.5 11.9 16 21.2 6.1-9.3 16-12.1 16-21.2C32 3.8 28.2 0 23.6 0z" '
-        f'fill="{PAPER}" stroke="{INK}" stroke-width="6"/></g>'
+        'c0 9.4 9.5 11.9 16 21.2 6.1-9.3 16-12.1 16-21.2C32 3.8 28.2 0 23.6 0z"/></g>'
         f'<text x="156" y="39" text-anchor="middle" font-family="sans-serif" '
-        f'font-size="15" font-weight="700" letter-spacing="2" fill="{PAPER}">{label}</text>'
+        f'font-size="15" font-weight="700" letter-spacing="2" fill="{fg}">{label}</text>'
         # rounded "app icon" with the monogram
         f'<rect x="92" y="118" width="116" height="116" rx="26" fill="{color}" '
         f'stroke="{INK}" stroke-width="4"/>'
         f'<text x="150" y="196" text-anchor="middle" font-family="sans-serif" '
-        f'font-size="{mono_size}" font-weight="700" fill="{PAPER}">{mono}</text>'
+        f'font-size="{mono_size}" font-weight="700" fill="{fg}">{mono}</text>'
         # three dots motif
         f'<g fill="{color}">'
         '<circle cx="118" cy="298" r="7"/><circle cx="150" cy="298" r="7"/>'

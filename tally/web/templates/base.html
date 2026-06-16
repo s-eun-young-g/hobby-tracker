@@ -29,13 +29,13 @@
     </nav>
     <div class="topbar-right">
       <div class="themes" role="group" aria-label="Colour palette">
-        <button class="swatch" data-theme="red" style="--s:#e5484d" title="Red"></button>
-        <button class="swatch" data-theme="orange" style="--s:#ef7d2e" title="Orange"></button>
-        <button class="swatch" data-theme="yellow" style="--s:#f4c20d" title="Yellow"></button>
-        <button class="swatch" data-theme="green" style="--s:#2f9e63" title="Green"></button>
-        <button class="swatch" data-theme="blue" style="--s:#1f86d6" title="Blue"></button>
-        <button class="swatch" data-theme="indigo" style="--s:#4b53d8" title="Indigo"></button>
-        <button class="swatch" data-theme="violet" style="--s:#9b51e0" title="Violet"></button>
+        <button class="swatch" data-theme="red" style="--s:#f2a6a4" title="Red"></button>
+        <button class="swatch" data-theme="orange" style="--s:#f6c098" title="Orange"></button>
+        <button class="swatch" data-theme="yellow" style="--s:#f4dd8e" title="Yellow"></button>
+        <button class="swatch" data-theme="green" style="--s:#a8d8b9" title="Green"></button>
+        <button class="swatch" data-theme="blue" style="--s:#9fc7ec" title="Blue"></button>
+        <button class="swatch" data-theme="indigo" style="--s:#b3b6ef" title="Indigo"></button>
+        <button class="swatch" data-theme="violet" style="--s:#cda9e8" title="Violet"></button>
       </div>
       <span id="clock" aria-hidden="true"></span>
     </div>
@@ -53,14 +53,23 @@
           s.setAttribute("aria-pressed", String(s.dataset.theme === cur));
         });
       }
+      // Game covers are palette-specific: re-point each one at the current theme.
+      function applyCovers(theme) {
+        document.querySelectorAll("[data-cover]").forEach(function (el) {
+          el.style.backgroundImage =
+            "url('/cover/" + el.dataset.cover + "?theme=" + theme + "')";
+        });
+      }
       swatches.forEach(function (s) {
         s.addEventListener("click", function () {
           root.setAttribute("data-theme", s.dataset.theme);
           try { localStorage.setItem("tally-theme", s.dataset.theme); } catch (e) {}
           mark();
+          applyCovers(s.dataset.theme);
         });
       });
       mark();
+      applyCovers(root.getAttribute("data-theme") || "blue");
     })();
     // Little menu-bar clock, for the retro-desktop feel.
     (function () {
