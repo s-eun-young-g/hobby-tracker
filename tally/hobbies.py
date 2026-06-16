@@ -86,9 +86,9 @@ HOBBIES: dict[str, Hobby] = {
                 _date())),
     "dialed_sound": Hobby(
         "dialed_sound", "Dialed", "game", True, "#0aa1dc",
-        score_better="high", score_label="/ 10",
-        fields=(Field("score", "Score (out of 10)", "number", "score",
-                      placeholder="e.g. 7.42"),
+        score_better="high", score_label="/ 50",
+        fields=(Field("score", "Score (out of 50)", "number", "score",
+                      placeholder="e.g. 42.75"),
                 Field("mode", "Mode", "select", "data", options=("Daily", "Free play")),
                 _date())),
     "book": Hobby(
